@@ -1,5 +1,5 @@
 # Percolation-in-a-System
-I developed this project using c++ language and SDML library.
+I developed this project using c++ language and SFML library.
 
 
 Percolation Simulation using SFML

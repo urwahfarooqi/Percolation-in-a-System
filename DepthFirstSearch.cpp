@@ -1,56 +1,77 @@
+#include<vector>
 #include <iostream>
-#include <vector>
-
+#include<string>
 using namespace std;
-
-class Graph {
+class WeightedQuickUnionUF
+{
 private:
-    int V; // Number of vertices
-    vector<vector<int>> adj; // Adjacency list
+    vector<int> parent;
+    vector<int> size;
+    int count;
 
-    void DFS(int v, vector<bool>& visited) {
-        visited[v] = true;
-        cout << v << " ";
+public:
+    WeightedQuickUnionUF(int n) : count(n)
+    {
+        parent.resize(n);
+        size.resize(n);
 
-        for (int neighbor : adj[v]) {
-            if (!visited[neighbor]) {
-                DFS(neighbor, visited);
-            }
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i] = 1;
         }
     }
 
-public:
-    Graph(int V) : V(V) {
-        adj.resize(V);
+    int getCount()
+    {
+        return count;
     }
 
-    void addEdge(int u, int v) {
-        adj[u].push_back(v);
-        adj[v].push_back(u); // For undirected graph
+    int find(int p)
+    {
+        validate(p);
+
+        while (p != parent[p])
+        {
+            parent[p] = parent[parent[p]]; // Path compression
+            p = parent[p];
+        }
+        return p;
     }
 
-    void connectedComponents() {
-        vector<bool> visited(V, false);
+    bool connected(int p, int q)
+    {
+        return find(p) == find(q);
+    }
 
-        for (int i = 0; i < V; ++i) {
-            if (!visited[i]) {
-                cout << "Component: ";
-                DFS(i, visited);
-                cout << endl;
-            }
+    void unionOp(int p, int q)
+    {
+        int rootP = find(p);
+        int rootQ = find(q);
+
+        if (rootP == rootQ)
+            return;
+
+        if (size[rootP] < size[rootQ])
+        {
+            parent[rootP] = rootQ;
+            size[rootQ] += size[rootP];
+        }
+        else
+        {
+            parent[rootQ] = rootP;
+            size[rootP] += size[rootQ];
+        }
+
+        count--;
+    }
+
+    void validate(int p)
+    {
+        int n = parent.size();
+        if (p < 0 || p >= n)
+        {
+            throw out_of_range("Index " + to_string(p) + " is out of range!");
         }
     }
 };
-
-// Example Usage
-int main() {
-    Graph g(5); // 5 vertices
-    g.addEdge(0, 1);
-    g.addEdge(1, 2);
-    g.addEdge(3, 4);
-
-    cout << "Connected Components:" << endl;
-    g.connectedComponents();
-
-    return 0;
-}
